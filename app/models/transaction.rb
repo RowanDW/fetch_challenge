@@ -15,4 +15,23 @@ class Transaction < ApplicationRecord
     def self.total_points_balance
         sum(:remaining_points)
     end
+
+    def self.unspent_transactions
+        where('remaining_points > 0').order(:timestamp)
+    end
+
+    def self.spend_points(pts, result = Hash.new(0))
+        current_trans = unspent_transactions.first
+        if pts > current_trans.remaining_points
+            result[current_trans.payer] -= current_trans.remaining_points
+            pts -= current_trans.remaining_points
+            current_trans.update(remaining_points: 0)
+            spend_points(pts, result)
+        else
+            result[current_trans.payer] -= pts
+            remaining = current_trans.remaining_points - pts
+            current_trans.update(remaining_points: remaining)
+            return result
+        end
+    end
 end
