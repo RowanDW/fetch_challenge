@@ -1,5 +1,5 @@
 class PointsController < ApplicationController
     def balance
-        Transaction.get_balances
+        render json: Transaction.point_balances
     end
 end

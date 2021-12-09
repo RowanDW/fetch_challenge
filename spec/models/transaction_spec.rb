@@ -17,9 +17,9 @@ RSpec.describe Transaction , type: :model do
             @transaction5 = Transaction.create(payer: "DANNON", points: 1000, timestamp: "2020-11-02T14:00:00Z", remaining_points: 1000)
         end
 
-        describe 'points_balance' do
+        describe 'point_balances' do
             it 'can return points balances for each payer' do
-                result = Transaction.points_balance
+                result = Transaction.point_balances
                 expect(result["DANNON"]).to eq(1300)
                 expect(result["UNILEVER"]).to eq(200)
                 expect(result["MILLER COORS"]).to eq(10000)
@@ -27,7 +27,7 @@ RSpec.describe Transaction , type: :model do
 
             it 'returns payers with zero point balances' do
                 transaction6 = Transaction.create(payer: "NINTENDO", points: 1000, timestamp: "2020-11-02T14:00:00Z", remaining_points: 0)
-                result = Transaction.points_balance
+                result = Transaction.point_balances
                 expect(result["DANNON"]).to eq(1300)
                 expect(result["UNILEVER"]).to eq(200)
                 expect(result["MILLER COORS"]).to eq(10000)
