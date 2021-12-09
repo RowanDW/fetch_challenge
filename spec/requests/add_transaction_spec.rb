@@ -9,7 +9,7 @@ RSpec.describe 'The add transacrion endpoint' do
 
     it 'can add a transacrion' do
         expect(Transaction.count).to eq(0)
-        post '/transaction', params: @params
+        post '/add_transaction', params: @params
 
         expect(response).to be_successful
 
@@ -22,7 +22,7 @@ RSpec.describe 'The add transacrion endpoint' do
     end
 
     it 'should return the new transaction' do
-        post '/transaction', params: @params
+        post '/add_transaction', params: @params
 
         expect(response).to be_successful
         result = JSON.parse(response.body, symbolize_names: true)
@@ -33,7 +33,7 @@ RSpec.describe 'The add transacrion endpoint' do
     end
 
     it 'returns an error given bad inputs' do
-        post '/transaction', params: @invalid
+        post '/add_transaction', params: @invalid
 
         expect(response).to have_http_status(400)
         result = JSON.parse(response.body, symbolize_names: true)

@@ -16,10 +16,4 @@ class TransactionsController < ApplicationController
             render json: {error: "Invalid transaction inputs"}, status: 400
         end
     end
-
-    private
-
-    def valid_inputs
-
-    end
 end
