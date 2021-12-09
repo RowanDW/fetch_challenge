@@ -11,4 +11,8 @@ class Transaction < ApplicationRecord
         payer_points.each { |pp| result_hash[pp.payer] = pp.balance } 
         result_hash
     end
+
+    def self.total_points_balance
+        sum(:remaining_points)
+    end
 end

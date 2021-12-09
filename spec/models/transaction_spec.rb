@@ -34,5 +34,16 @@ RSpec.describe Transaction , type: :model do
                 expect(result["NINTENDO"]).to eq(0)
             end
         end
+
+        describe 'total_points_balance' do
+            it 'can calculate the total points for a user' do
+                expect(Transaction.total_points_balance).to eq(11500)
+            end
+
+            it 'returns zero if there are no transactions' do
+                Transaction.destroy_all
+                expect(Transaction.total_points_balance).to eq(0)
+            end
+        end
     end
 end
