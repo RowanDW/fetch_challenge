@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe 'The add transacrion endpoint' do
     before :each do
         @params = { "payer": "DANNON", "points": 1000, "timestamp": "2020-11-02T14:00:00Z" }
+
         @invalid1 = { "points": 1000, "timestamp": "2020-11-02T14:00:00Z" }
         @invalid1 = { "payer": "DANNON", "points": "abc", "timestamp": "2020-11-02T14:00:00Z" }
     end
@@ -30,6 +31,24 @@ RSpec.describe 'The add transacrion endpoint' do
         expect(result[:payer]).to eq(@params[:payer])
         expect(result[:points]).to eq(@params[:points])
         expect(result[:timestamp].to_datetime).to eq(@params[:timestamp].to_datetime)
+    end
+
+    it 'subtracts from payer points given negative points balance' do
+        params_neg = { "payer": "DANNON", "points": -200, "timestamp": "2020-11-02T14:00:00Z" }
+
+        transaction = Transaction.create(payer: "DANNON", points: 300, timestamp: "2020-10-31T10:00:00Z", remaining_points: 300)
+        expect(transaction.remaining_points).to eq(300)
+        post '/add_transaction', params: params_neg
+
+        expect(response).to be_successful
+        result = JSON.parse(response.body, symbolize_names: true)
+
+        transaction.reload
+        expect(transaction.remaining_points).to eq(100)
+
+        expect(result[:payer]).to eq(params_neg[:payer])
+        expect(result[:points]).to eq(params_neg[:points])
+        expect(result[:timestamp].to_datetime).to eq(params_neg[:timestamp].to_datetime)
     end
 
     it 'returns an error given bad inputs' do
