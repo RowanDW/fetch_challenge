@@ -16,8 +16,12 @@ class Transaction < ApplicationRecord
         sum(:remaining_points)
     end
 
-    def self.unspent_transactions
-        where('remaining_points > 0').order(:timestamp)
+    def self.unspent_transactions(target_payer = '')
+        if target_payer.present?
+            where('remaining_points > 0').where('payer = ?', target_payer).order(:timestamp)
+        else
+            where('remaining_points > 0').order(:timestamp)
+        end
     end
 
     def self.spend_points(pts, result = Hash.new(0))
@@ -33,5 +37,18 @@ class Transaction < ApplicationRecord
             current_trans.update(remaining_points: remaining)
             return result
         end
+    end
+
+    def self.subtract_payer_points(points, payer)
+        current_trans = unspent_transactions(payer).first
+        if points > current_trans.remaining_points
+            points -= current_trans.remaining_points
+            current_trans.update(remaining_points: 0)
+            subtract_payer_points(points, payer)
+        else
+            remaining = current_trans.remaining_points - points
+            current_trans.update(remaining_points: remaining)
+        end
+
     end
 end

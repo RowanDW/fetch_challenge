@@ -62,6 +62,13 @@ RSpec.describe Transaction , type: :model do
                 expect(result.third).to eq(@transaction4)
                 expect(result.fourth).to eq(@transaction5)
             end
+
+            it 'return all transactions for a given payer with postitive remaining points' do
+                result = Transaction.unspent_transactions("DANNON")
+                
+                expect(Transaction.count).to eq(5)
+                expect(result.count).to eq(2)
+            end
         end
 
         describe '.spend_points' do
@@ -90,6 +97,29 @@ RSpec.describe Transaction , type: :model do
                 expect(result.keys.count).to eq(2)
                 expect(result["DANNON"]).to eq(-300)
                 expect(result["UNILEVER"]).to eq(-100)
+            end
+        end
+
+        describe '.subtract_payer_points' do
+            it 'subtracts points from a single payers unspent transaction' do
+                expect(@transaction2.remaining_points).to eq(300)
+                Transaction.subtract_payer_points(200, "DANNON")
+
+                @transaction2.reload
+
+                expect(@transaction2.remaining_points).to eq(100)
+            end
+
+            it 'subtracts points from mulitple payers unspent transactions' do
+                expect(@transaction2.remaining_points).to eq(300)
+                expect(@transaction5.remaining_points).to eq(1000)
+                Transaction.subtract_payer_points(600, "DANNON")
+
+                @transaction2.reload
+                @transaction5.reload
+
+                expect(@transaction2.remaining_points).to eq(0)
+                expect(@transaction5.remaining_points).to eq(700)
             end
         end
     end
